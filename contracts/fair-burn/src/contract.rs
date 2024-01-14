@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    ensure, to_binary, Addr, BankMsg, Binary, Coin, Deps, DepsMut, Empty, Env, Event, MessageInfo,
+    ensure, to_json_binary, Addr, BankMsg, Binary, Coin, Deps, DepsMut, Empty, Env, Event, MessageInfo,
     StdResult,
 };
 use cw2::{get_contract_version, set_contract_version};
@@ -153,8 +153,8 @@ pub fn execute_fair_burn(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::ContractVersion {} => to_binary(&get_contract_version(deps.storage)?),
-        QueryMsg::Config {} => to_binary(&CONFIG.load(deps.storage)?),
+        QueryMsg::ContractVersion {} => to_json_binary(&get_contract_version(deps.storage)?),
+        QueryMsg::Config {} => to_json_binary(&CONFIG.load(deps.storage)?),
     }
 }
 
@@ -194,7 +194,7 @@ mod tests {
     };
 
     use cosmwasm_std::{
-        coin, coins, to_binary, Addr, Coin, Decimal, Event, StdResult, Uint128, WasmMsg,
+        coin, coins, to_json_binary, Addr, Coin, Decimal, Event, StdResult, Uint128, WasmMsg,
     };
     use cw_multi_test::{
         AppResponse, BankSudo, Contract, ContractWrapper, Executor, SudoMsg as CwSudoMsg, WasmSudo,
@@ -245,7 +245,7 @@ mod tests {
         let msg = WasmMsg::Instantiate {
             admin: None,
             code_id: fair_burn_id,
-            msg: to_binary(&init_msg).unwrap(),
+            msg: to_json_binary(&init_msg).unwrap(),
             funds: vec![],
             label: "FairBurn".to_string(),
         };
@@ -284,7 +284,7 @@ mod tests {
         };
         let response = app.sudo(CwSudoMsg::Wasm(WasmSudo {
             contract_addr: fair_burn.clone(),
-            msg: to_binary(&sudo_msg).unwrap(),
+            msg: to_json_binary(&sudo_msg).unwrap(),
         }));
         assert!(response.is_ok());
 
