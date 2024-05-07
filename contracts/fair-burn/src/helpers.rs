@@ -6,7 +6,7 @@ use crate::{msg::ExecuteMsg, state::Config};
 pub fn calculate_payouts(funds: &Coin, config: &Config) -> (Coin, Option<Coin>) {
     let denom = funds.denom.clone();
 
-    let protocol_amount = funds.amount.mul_ceil(config.fee_percent);
+    let protocol_amount = funds.amount.mul_ceil(config.fee_percent).div_floor(100u128);;
     let protocol_coin = coin(protocol_amount.u128(), &denom);
 
     let dist_coin = match funds.amount - protocol_amount {
